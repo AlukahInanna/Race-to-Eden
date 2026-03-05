@@ -6,50 +6,51 @@ import settings
 pygame.init()
 cript_dir = os.path.dirname(__file__)
 
-# --- NEW: LOAD AND PLAY MUSIC ---
-music_path = os.path.join(cript_dir, "GameMenuMusic.mp3")
+
+music_path = os.path.join(cript_dir, "music/GameMenuMusic.mp3") #music path
 try:
     pygame.mixer.music.load(music_path)
-    # Play the music. The '-1' tells Pygame to loop it infinitely!
+    
     pygame.mixer.music.play(-1) 
     
-    # Set default starting volume (Master 1.0 * Music 0.8)
-    pygame.mixer.music.set_volume(0.8) 
+    
+    pygame.mixer.music.set_volume(0.75) 
 except pygame.error:
-    print("WARNING: Could not load 'music.mp3'. Check the file name!")
-# 1. Set up the 1080p display
+    print("Error start menu music")
+
+#default resolution
 SCREEN_WIDTH = 1920
 SCREEN_HEIGHT = 1080
 screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
 pygame.display.set_caption("Race to Eden")
 
-# 2. Set up our fonts
-# We use a huge font for the title and a smaller one for the buttons
-title_font = pygame.font.Font("letters.ttf", 160)
-button_font = pygame.font.Font("letters.ttf", 50) 
+# set up fonts
+title_font = pygame.font.Font("fonts/letters.ttf", 160)
+button_font = pygame.font.Font("fonts/letters.ttf", 50) 
 
-# Load the background image and scale it to fit 1080p
+# Load the background image and scale to 1080p
 script_dir = os.path.dirname(__file__)
-image_path = os.path.join(script_dir, "background.png") 
+image_path = os.path.join(script_dir, "images/background.png") #path of the picture
 bg_image = pygame.image.load(image_path).convert() 
 bg_image = pygame.transform.scale(bg_image, (SCREEN_WIDTH, SCREEN_HEIGHT))
 
 def draw_button(screen, text, center_x, center_y, mouse_pos):
-    """Draws clickable text that changes color on hover."""
-    # 1. Render the text temporarily to get its exact dimensions and create a hitbox
+    
+    # creates a temporary image of the text to measure size
     temp_surf = button_font.render(text, True, (255, 255, 255))
+    #it makes a rectange exaclty centred where we want it
     button_rect = temp_surf.get_rect(center=(center_x, center_y))
     
-    # 2. Check if the mouse is hovering over the text's invisible hitbox
+    #check where if the mouse is in the rectange
     if button_rect.collidepoint(mouse_pos):
-        color = (255, 215, 0)  # Gold/Yellow for hover state
+        color = (255, 215, 0)  
     else:
-        color = (255, 255, 255)  # White for normal state
+        color = (255, 255, 255)  
         
-    # 3. Render the text again with the correct color
+    # changes the  color
     final_text_surf = button_font.render(text, True, color)
     
-    # 4. Draw the colored text to the screen
+    # draw the colored text to the screen
     screen.blit(final_text_surf, button_rect)
     
     return button_rect
@@ -57,42 +58,39 @@ def draw_button(screen, text, center_x, center_y, mouse_pos):
 def run_menu():
     menu_running = True
     
-    button_width = 480
-    button_height = 110
     
-    # Math to find the exact horizontal center of the screen
-    center_x = (SCREEN_WIDTH // 2)
+    center_x = (SCREEN_WIDTH // 2) #center of the screen
     
     while menu_running:
-        screen.blit(bg_image, (0, 0))
+        screen.blit(bg_image, (0, 0)) #loads the backgound to the screen
         mouse_pos = pygame.mouse.get_pos() 
         
-        # --- NEW: Draw the Game Title ---
-        # We render it in white (255, 255, 255), but you can change these RGB numbers!
-        title_surf = title_font.render("Race to Eden", True, (255, 255, 255))
-        # Center the title at X = middle of screen, Y = 200 (near the top)
-        title_rect = title_surf.get_rect(center=(SCREEN_WIDTH // 2, 200)) 
-        screen.blit(title_surf, title_rect)
-        # --------------------------------
         
-        # Draw buttons below the title (Starting at Y = 450 to give the title breathing room)
+        
+        title_surf = title_font.render("Race to Eden", True, (255, 255, 255)) #  render it in white (255, 255, 255)
+       
+        title_rect = title_surf.get_rect(center=(center_x, 200)) #possition on the screen
+        screen.blit(title_surf, title_rect)#output to the screen
+       
+        
+        # buttons below the title
         start_button = draw_button(screen, "Start Game", center_x, 450, mouse_pos)
         settings_button = draw_button(screen, "Settings", center_x, 570, mouse_pos)
         exit_button = draw_button(screen, "Exit", center_x, 690, mouse_pos)
         
-        for event in pygame.event.get():
-            if event.type == pygame.QUIT:
+        for event in pygame.event.get():#main loop 
+            if event.type == pygame.QUIT: # so the x on the screen works
                 pygame.quit()
                 sys.exit()
-            if event.type == pygame.MOUSEBUTTONDOWN:
+            if event.type == pygame.MOUSEBUTTONDOWN: #mouse sellection
                 if event.button == 1: 
-                    if start_button.collidepoint(mouse_pos):
+                    if start_button.collidepoint(mouse_pos): #main game loads
                         print("Start Game clicked!")
                         menu_running = False 
-                    elif settings_button.collidepoint(mouse_pos):
+                    elif settings_button.collidepoint(mouse_pos):#seetings page loads
                         settings.run(screen, bg_image, title_font, button_font)
                         print("Settings clicked!")
-                    elif exit_button.collidepoint(mouse_pos):
+                    elif exit_button.collidepoint(mouse_pos):#exit button on the screen
                         print("Exit clicked!")
                         pygame.quit()
                         sys.exit()

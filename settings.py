@@ -1,9 +1,6 @@
 import pygame
 import sys
 
-# ==========================================
-# UI COMPONENTS
-# ==========================================
 
 class Button:
     """A blueprint for all clickable text buttons."""
@@ -32,7 +29,7 @@ class Button:
                 return True # The button was clicked!
         return False
 
-
+# Volume Sliders
 class Slider:
     """A blueprint for interactive volume sliders."""
     def __init__(self, x, y, width, label, font, initial_val=1.0):
@@ -93,9 +90,9 @@ class Slider:
         self.update_knob()
 
 
-# ==========================================
+
 # SCREEN MANAGER
-# ==========================================
+
 
 class SettingsScreen:
     """Manages the entire settings menu loop, drawing, and events."""
@@ -169,14 +166,9 @@ class SettingsScreen:
             self.draw()
             pygame.display.flip()
 
-# ==========================================
-# ENTRY POINT
-# ==========================================
 
-def run(screen, bg_image, title_font, button_font):
-    """
-    This function exists so your menu.py file doesn't break! 
-    It just creates the screen class and starts it.
-    """
+# ENTRY POINT
+
+def run(screen, bg_image, title_font, button_font): 
     settings_menu = SettingsScreen(screen, bg_image, title_font, button_font)
     settings_menu.start()
