@@ -7,9 +7,9 @@ import movement_system
 pygame.init()
 cript_dir = os.path.dirname(__file__)
 
-master_volume = 1.0
-music_volume = 0.75
-sfx_volume = 0.8
+master_volume = 0.50
+music_volume = 0.50
+sfx_volume = 0.50
 
 def music(master_volume, music_volume):
     music_path = os.path.join(cript_dir, "music","GameMenuMusic.mp3") #music path
