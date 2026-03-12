@@ -161,42 +161,6 @@ class Player():
         return 0
 
 
-    def ApplyConsumableEffect(self, effect_data):
-        if not effect_data:
-            print("No consumable effect to apply.")
-            return
-
-        effect = effect_data.get("effect")
-
-        if effect == "restore":
-            self.RestorePercent(effect_data.get("resource"), effect_data.get("value", 0))
-            return
-
-        if effect == "cure_poison":
-            self.poisoned = False
-            print(f"{self.name} is cured from poison.")
-            return
-
-        if effect in ["strength_buff", "defense_buff"]:
-            self.active_buffs[effect] = effect_data.get("duration", 3)
-            print(f"{effect} applied for {self.active_buffs[effect]} turns.")
-            return
-
-        if effect == "shield":
-            if self.shield > 0:
-                print("Shield is already active.")
-                return
-            self.shield = int(self.max_health * effect_data.get("value", 0.40))
-            print(f"Shield applied: {self.shield}")
-            return
-
-        if effect == "auto_revive":
-            if self.alive:
-                return
-            self.Revive(effect_data.get("value", 0.40))
-            return
-
-
     def TickTurn(self):
         if self.active_buffs["strength_buff"] > 0:
             self.active_buffs["strength_buff"] -= 1
