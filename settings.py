@@ -1,5 +1,13 @@
 import pygame
 import sys
+import os
+
+
+SCRIPT_DIR = os.path.dirname(__file__)
+FONT_PATH = os.path.join(SCRIPT_DIR, "fonts", "letters.ttf")
+BACKGROUND_PATH = os.path.join(SCRIPT_DIR, "images", "background.png")
+SCREEN_WIDTH = 1920
+SCREEN_HEIGHT = 1080
 
 
 class Button:
@@ -96,10 +104,25 @@ class Slider:
 
 class SettingsScreen:
     """Manages the entire settings menu loop, drawing, and events."""
-    def __init__(self, screen, bg_image, title_font, button_font):
-        self.screen = screen
-        self.bg_image = bg_image
-        self.title_font = title_font
+    def __init__(
+        self,
+        master_volume=1.0,
+        music_volume=0.8,
+        sfx_volume=0.8,
+    ):
+        self.screen = pygame.display.get_surface()
+        if self.screen is None:
+            self.screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
+
+        try:
+            background = pygame.image.load(BACKGROUND_PATH).convert()
+            self.bg_image = pygame.transform.scale(background, self.screen.get_size())
+        except pygame.error:
+            self.bg_image = pygame.Surface(self.screen.get_size())
+            self.bg_image.fill((20, 30, 40))
+
+        self.title_font = pygame.font.Font(FONT_PATH, 160)
+        button_font = pygame.font.Font(FONT_PATH, 50)
         self.running = True
         
         center_x = self.screen.get_width() // 2
@@ -107,9 +130,9 @@ class SettingsScreen:
         
         # Create all our UI elements once
         self.sliders = [
-            Slider(slider_x, 400, 400, "Master Volume", button_font, 1.0),
-            Slider(slider_x, 520, 400, "Music Volume", button_font, 0.8),
-            Slider(slider_x, 640, 400, "SFX Volume", button_font, 0.8)
+            Slider(slider_x, 400, 400, "Master Volume", button_font, master_volume),
+            Slider(slider_x, 520, 400, "Music Volume", button_font, music_volume),
+            Slider(slider_x, 640, 400, "SFX Volume", button_font, sfx_volume)
         ]
         
         self.back_button = Button("Back To Main Menu", center_x, 800, button_font)
@@ -150,25 +173,20 @@ class SettingsScreen:
         while self.running:
             self.handle_events()
             
-            # --- NEW: APPLY VOLUMES IN REAL-TIME ---
-            # sliders[0] is Master, sliders[1] is Music
             master_vol = self.sliders[0].val
             music_vol = self.sliders[1].val
+            sfx_vol = self.sliders[2].val
             
-            # Final volume is Master multiplied by Music 
-            # (e.g., 50% Master * 50% Music = 25% actual output)
-            final_music_volume = master_vol * music_vol
-            
-            # Send the new volume directly to Pygame's global DJ!
-            pygame.mixer.music.set_volume(final_music_volume)
-           
-            
+            pygame.mixer.music.set_volume(master_vol * music_vol)
+
             self.draw()
             pygame.display.flip()
+
+        return music_vol, sfx_vol, master_vol
 
 
 # ENTRY POINT
 
-def run(screen, bg_image, title_font, button_font): 
-    settings_menu = SettingsScreen(screen, bg_image, title_font, button_font)
-    settings_menu.start()
+def run(master_volume=1.0, music_volume=0.8, sfx_volume=0.8):
+    settings_menu = SettingsScreen(master_volume, music_volume, sfx_volume)
+    return settings_menu.start()

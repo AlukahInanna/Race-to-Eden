@@ -2,21 +2,26 @@ import pygame
 import sys
 import os
 import settings
+import movement_system
 # Initialize Pygame
 pygame.init()
 cript_dir = os.path.dirname(__file__)
 
+master_volume = 1.0
+music_volume = 0.75
+sfx_volume = 0.8
 
-music_path = os.path.join(cript_dir, "music/GameMenuMusic.mp3") #music path
-try:
-    pygame.mixer.music.load(music_path)
-    
-    pygame.mixer.music.play(-1) 
-    
-    
-    pygame.mixer.music.set_volume(0.75) 
-except pygame.error:
-    print("Error start menu music")
+def music(master_volume, music_volume):
+    music_path = os.path.join(cript_dir, "music","GameMenuMusic.mp3") #music path
+    try:
+        pygame.mixer.music.load(music_path)
+        
+        pygame.mixer.music.play(-1) 
+        
+        
+        pygame.mixer.music.set_volume(master_volume * music_volume) 
+    except pygame.error:
+        print("Error start menu music")
 
 #default resolution
 SCREEN_WIDTH = 1920
@@ -56,8 +61,9 @@ def draw_button(screen, text, center_x, center_y, mouse_pos):
     return button_rect
 
 def run_menu():
+    global master_volume, music_volume, sfx_volume
     menu_running = True
-    
+    music(master_volume, music_volume)
     
     center_x = (SCREEN_WIDTH // 2) #center of the screen
     
@@ -78,7 +84,7 @@ def run_menu():
         settings_button = draw_button(screen, "Settings", center_x, 570, mouse_pos)
         exit_button = draw_button(screen, "Exit", center_x, 690, mouse_pos)
         
-        for event in pygame.event.get():#main loop 
+        for event in pygame.event.get():
             if event.type == pygame.QUIT: # so the x on the screen works
                 pygame.quit()
                 sys.exit()
@@ -86,9 +92,10 @@ def run_menu():
                 if event.button == 1: 
                     if start_button.collidepoint(mouse_pos): #main game loads
                         print("Start Game clicked!")
-                        menu_running = False 
+                        pygame.mixer.music.stop()
+                        movement_system.main(master_volume, music_volume, sfx_volume)
                     elif settings_button.collidepoint(mouse_pos):#seetings page loads
-                        settings.run(screen, bg_image, title_font, button_font)
+                        music_volume, sfx_volume, master_volume = settings.run(master_volume,music_volume,sfx_volume)
                         print("Settings clicked!")
                     elif exit_button.collidepoint(mouse_pos):#exit button on the screen
                         print("Exit clicked!")
